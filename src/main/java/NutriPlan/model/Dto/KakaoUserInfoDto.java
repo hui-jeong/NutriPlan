@@ -1,17 +1,15 @@
 package NutriPlan.model.Dto;
 
 public class KakaoUserInfoDto {
-    private Long kakaoId; // 카카오 사용자 ID
-    private String nickname; // 사용자의 닉네임
-    //private String email; // 사용자의 이메일
+    private Long kakaoId;
+    private String nickname;
+    //private String email;
 
-    // 생성자
     public KakaoUserInfoDto(Long id, String nickname) {
-        this.kakaoId = kakaoId;
+        this.kakaoId = id;
         this.nickname = nickname;
     }
 
-    // Getter와 Setter
     public Long getKakaoId() {
         return kakaoId;
     }

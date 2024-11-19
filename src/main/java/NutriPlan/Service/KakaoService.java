@@ -18,7 +18,6 @@ import java.net.URI;
 @Service
 public class KakaoService {
 
-
     @Autowired
     private final UserService userService;
 
@@ -28,27 +27,19 @@ public class KakaoService {
     @Value("${kakao.redirect.uri}")
     private String redirectUrl;
 
+    @Value("${kakao.redirect.uri}")
+    private String redirectUri;
     public KakaoService( UserService userService) {
-
-
         this.userService = userService;
     }
 
     public String kakaoLogin(String code) throws JsonProcessingException {
-        // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getToken(code);
 
-        // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-        KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
 
-        // 3. JWT 토큰 생성 로직 (예시)
-        String createToken = generateJwtToken(kakaoUserInfo);
-
-        return createToken;
+        return getToken(code);
     }
 
     private String getToken(String code) throws JsonProcessingException {
-        // 요청 URL 만들기
         URI uri = UriComponentsBuilder
                 .fromUriString("https://kauth.kakao.com")
                 .path("/oauth/token")
@@ -56,7 +47,6 @@ public class KakaoService {
                 .build()
                 .toUri();
 
-        // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
@@ -73,20 +63,19 @@ public class KakaoService {
                 .body(body);
         RestTemplate restTemplate= new RestTemplate();
 
-        // HTTP 요청 보내기
         ResponseEntity<String> response = restTemplate.exchange(
                 requestEntity,
                 String.class
         );
 
-        // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
         System.out.println("TOKEN: "+jsonNode.get("access_token").asText());
         return jsonNode.get("access_token").asText();
     }
 
-    private KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
-        // 요청 URL 만들기
+    public KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
+        System.out.println("getKakaoUserInfo 호출됨. accessToken: " + accessToken);  // 확인
+
         URI uri = UriComponentsBuilder
                 .fromUriString("https://kapi.kakao.com")
                 .path("/v2/user/me")
@@ -94,7 +83,6 @@ public class KakaoService {
                 .build()
                 .toUri();
 
-        // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -105,25 +93,63 @@ public class KakaoService {
                 .body(new LinkedMultiValueMap<>());
         RestTemplate restTemplate = new RestTemplate();
 
-        // HTTP 요청 보내기
         ResponseEntity<String> response = restTemplate.exchange(
                 requestEntity,
                 String.class
         );
+        System.out.println("카카오 API 응답: " + response.getBody());  // 응답 JSON 출력
 
-        // 응답 JSON 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
+        System.out.println("JSON 응답 ID: " + jsonNode.get("id"));
+        System.out.println("JSON 응답 닉네임: " + jsonNode.get("properties").get("nickname"));
+
         Long kakaoId = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties").get("nickname").asText();
         // profileImg = jsonNode.get("properties").get("profile_image").asText();
         System.out.println("KAKAOID/NICKNAME: "+kakaoId+nickname);
-        userService.saveUser(kakaoId, nickname);
+
+        Long userId = userService.saveUser(kakaoId, nickname);
+        System.out.println(userId);
+        if (userId == null) {
+            System.out.println(userId+"!");
+            throw new IllegalArgumentException("Kakao ID가 null입니다.");
+        }
 
         return new KakaoUserInfoDto(kakaoId, nickname);
     }
 
     private String generateJwtToken(KakaoUserInfoDto kakaoUserInfo) {
-        // JWT 생성 로직 구현
-        return "generatedJwtToken"; // 생성된 JWT 반환
+        return "generatedJwtToken";
     }
+
+    public String getKakaoAuthUrl() {
+        String authUrl = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + clientId + "&redirect_uri=" + redirectUri;
+        return authUrl;
+    }
+
+
+    //로그아웃
+    public void kakaoLogout(String accessToken) {
+        URI uri = UriComponentsBuilder
+                .fromUriString("https://kapi.kakao.com")
+                .path("/v1/user/logout")
+                .encode()
+                .build()
+                .toUri();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        RequestEntity<Void> requestEntity = RequestEntity
+                .post(uri)
+                .headers(headers)
+                .build();
+
+        RestTemplate restTemplate = new RestTemplate();
+
+
+        restTemplate.exchange(requestEntity, Void.class);
+    }
+
 }
