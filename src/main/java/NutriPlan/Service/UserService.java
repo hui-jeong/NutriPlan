@@ -78,4 +78,14 @@ public class UserService {
     public Optional<User> findById(int id) {
         return userRepository.findById(id);
     }
+
+    // user ID로 사용자 삭제
+    public void deleteUserByUserId(int userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);  // userId로 사용자 조회
+        optionalUser.ifPresent(user -> {
+            Long kakaoId = user.getKakaoId();  // 해당 사용자의 kakaoId
+            userRepository.delete(user);  // 해당 사용자 삭제
+            System.out.println("User with userId " + userId + " and kakaoId " + kakaoId + " has been deleted.");
+        });
+    }
 }
