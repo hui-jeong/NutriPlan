@@ -68,25 +68,38 @@ public class KakaoLogin {
 
     //로그아웃
     @GetMapping("/spring/kakao/logout")
-    public String kakaoLogout(HttpServletRequest request, HttpServletResponse response, @RequestParam("access_token") String accessToken) {
+    public String kakaoLogout(
+            @RequestParam("userId") int userId,  // 삭제할 사용자 ID
+            @RequestParam("access_token") String accessToken,  // 카카오 access_token
+            HttpServletRequest request,  // HttpServletRequest to invalidate session
+            HttpServletResponse response  // HttpServletResponse to handle cookies
+    ) {
+        try {
+            // 카카오 로그아웃 API 호출
+            kakaoService.kakaoLogout(accessToken); // KakaoService에서 로그아웃 처리
 
-        request.getSession().invalidate();
+            // 사용자 삭제 (userId로 사용자 삭제)
+            userService.deleteUserByUserId(userId);
 
+            // 세션 무효화
+            request.getSession().invalidate();
 
-        Cookie cookie = new Cookie("access_token", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+            // 'access_token' 쿠키 삭제
+            Cookie cookie = new Cookie("access_token", null);
+            cookie.setMaxAge(0);  // 쿠키를 즉시 만료
+            cookie.setPath("/");  // 모든 경로에서 쿠키 삭제
+            response.addCookie(cookie);
 
-        // 카카오 로그아웃 API 호출
-        String logoutUrl = "https://kapi.kakao.com/v1/user/logout";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+            // 로그아웃 후 /logout으로 리다이렉트
+            return "redirect:/logout";  // 리다이렉트 URL
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "로그아웃 중 오류가 발생했습니다.";  // 오류 메시지 반환
+        }
+        }
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> logoutResponse = restTemplate.exchange(logoutUrl, HttpMethod.POST, entity, String.class);
-
-        return "redirect:/spring/kakao/login";
+    @GetMapping("/logout")  // 로그아웃 후 리다이렉트될 URL
+    public String redirectToLogoutPage() {
+        return "로그아웃이 완료되었습니다. 다시 로그인 해주세요.";
     }
 }
