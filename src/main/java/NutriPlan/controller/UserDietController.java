@@ -37,7 +37,7 @@ public class UserDietController {
         try{
             Map<String, Object> data = (Map<String, Object>) requestData.get("data");
 
-            Long userId = Long.valueOf(data.get("userId").toString());
+            int userId = Integer.valueOf(data.get("userId").toString());
             String foodName = data.get("foodName").toString();
             double kcal = Double.parseDouble(data.get("kcal").toString());
             int servingSize = Integer.parseInt(data.get("servingSize").toString());

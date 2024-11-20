@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserDietPlanRepository extends JpaRepository<UserDietPlan, Long> {
+public interface UserDietPlanRepository extends JpaRepository<UserDietPlan, Integer> {
     //void saveUserDietPlan(Long userId, Long foodId);
 }

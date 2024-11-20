@@ -2,12 +2,12 @@ package NutriPlan.model.Dto;
 
 public class KakaoUserInfoDto {
     private Long kakaoId;
-    private String nickname;
+    private String nick;
     //private String email;
 
-    public KakaoUserInfoDto(Long id, String nickname) {
+    public KakaoUserInfoDto(Long id, String nick) {
         this.kakaoId = id;
-        this.nickname = nickname;
+        this.nick = nick;
     }
 
     public Long getKakaoId() {
@@ -18,12 +18,12 @@ public class KakaoUserInfoDto {
         this.kakaoId  = kakaoId ;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getNick() {
+        return nick;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setNick(String nick) {
+        this.nick = nick;
     }
 
 

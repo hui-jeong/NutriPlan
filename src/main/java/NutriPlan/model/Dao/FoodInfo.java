@@ -10,13 +10,18 @@ import jakarta.persistence.Table;
 public class FoodInfo {
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private Integer id;
+    @Column(nullable = false)
     private String foodName;
+    @Column(nullable = false)
     private int servingSize;
+    @Column(nullable = false)
     private double kcal;
+    @Column(nullable = false)
     private double protein;
+    @Column(nullable = false)
     private double fat;
+    @Column(nullable = false)
     private double carbohydrate;
     public FoodInfo() {
     }
@@ -29,11 +34,11 @@ public class FoodInfo {
         this.fat = fat;
         this.servingSize = servingSize;
     }
-    public Long getFoodId() {
+    public int getFoodId() {
         return id;
     }
 
-    public void setFoodId(Long foodId) {
+    public void setFoodId(int foodId) {
     }
     public String getFoodName() {
         return foodName;

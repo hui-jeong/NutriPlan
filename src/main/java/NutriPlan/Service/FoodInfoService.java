@@ -14,7 +14,7 @@ public class FoodInfoService {
         this.foodInfoRepository = foodInfoRepository;
     }
 
-    public Long findOrSaveFood(FoodInfo foodInfo) {
+    public int findOrSaveFood(FoodInfo foodInfo) {
         return foodInfoRepository.findByFoodName(foodInfo.getFoodName())
                 .map(FoodInfo::getFoodId)
                 .orElseGet(() -> foodInfoRepository.save(foodInfo).getFoodId());

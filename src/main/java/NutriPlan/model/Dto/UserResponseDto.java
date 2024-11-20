@@ -1,22 +1,22 @@
 package NutriPlan.model.Dto;
 
 public class UserResponseDto {
-    private Long userId;
-    private String nickname;
+    private int userId;
+    private String nick;
     private Integer bmr;
 
-    public UserResponseDto(Long userId, String nickname, Integer bmr) {
+    public UserResponseDto(int userId, String nick, Integer bmr) {
         this.userId = userId;
-        this.nickname = nickname;
+        this.nick = nick;
         this.bmr = bmr;
     }
 
-    public Long getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getNick() {
+        return nick;
     }
 
     public Integer getBmr() {

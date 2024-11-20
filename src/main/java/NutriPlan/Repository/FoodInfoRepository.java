@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FoodInfoRepository extends JpaRepository<FoodInfo, Long> {
+public interface FoodInfoRepository extends JpaRepository<FoodInfo, Integer> {
     Optional<FoodInfo> findByFoodName(String foodName);
 }

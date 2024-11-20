@@ -4,7 +4,6 @@ package NutriPlan.Service;
 import NutriPlan.Repository.UserRepository;
 import NutriPlan.model.Dao.User;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,36 +19,40 @@ public class UserService {
     private EntityManagerFactory entityManagerFactory;
 
 
-    public Long saveUser(Long kakaoId, String nickname){
-        User user = userRepository.findByKakaoId(kakaoId);
+    public int saveUser(Long kakaoId, String nick){
+        Optional<User> optionalUser = userRepository.findByKakaoId(kakaoId);
 
-        if (user == null) {
-            user = new User();
-            user.setKakaoId(kakaoId);
-            user.setNickname(nickname);
-            userRepository.save(user);
-            System.out.println("새 사용자 생성됨: kakaoId = " + kakaoId + ", nickname = " + nickname);
-        } else {
-            System.out.println("기존 사용자 존재: ID = " + user.getId());
-        }
-        System.out.println("찾은 사용자: " + user.getId());
+        User user = optionalUser.orElseGet(() -> {
+            User newUser = new User();
+            newUser.setKakaoId(kakaoId);
+            newUser.setNick(nick);
+            userRepository.save(newUser);
+            System.out.println("새 사용자 생성됨: kakaoId = " + kakaoId + ", nickname = " + nick);
+            return newUser;
+        });
+
+        System.out.println("기존 사용자 존재: ID = " + user.getId());
         return user.getId();
     }
 
-    public Long getUserIdByKakaoId(Long kakaoId) {
-        User user = userRepository.findByKakaoId(kakaoId);
+//    public int getUserIdByKakaoId(int kakaoId) {
+//        User user = userRepository.findByKakaoId(kakaoId);
+//
+//        if (user == null) {
+//            System.out.println("해당 kakaoId에 대한 사용자가 없습니다.");
+//            return 0;
+//        }
+//        System.out.println("getUserIdByKakaoId="+user.getId());
+//        return user.getId();
+//    }
 
-        if (user == null) {
-            System.out.println("해당 kakaoId에 대한 사용자가 없습니다.");
-            return null;
-        }
-        System.out.println("getUserIdByKakaoId="+user.getId());
-        return user.getId();
-    }
-
-    public User updateUserInfo(Long userId, Integer age, Integer height, Integer weight, Integer gender) {
+    public User updateUserInfo(int userId, Integer age, Integer height, Integer weight, Integer gender) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자가 존재하지 않습니다."));
+
+        if (age == null || height == null || weight == null || gender == null) {
+            throw new IllegalArgumentException("모든 값을 입력해야 합니다.");
+        }
 
         user.setAge(age);
         user.setHeight(height);
@@ -63,6 +66,7 @@ public class UserService {
         return user;
     }
 
+
     private int calculateBmr(int height, int weight, int age, int gender) {
         if (gender == 1) {  // 남성
             return (int) (88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age));
@@ -71,7 +75,7 @@ public class UserService {
         }
     }
 
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(int id) {
         return userRepository.findById(id);
     }
 }

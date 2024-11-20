@@ -38,18 +38,18 @@ public class KakaoLogin {
 
         KakaoUserInfoDto userInfo = kakaoService.getKakaoUserInfo(token);
         Long kakaoId = userInfo.getKakaoId();
-        String nickname = userInfo.getNickname();
+        String nick = userInfo.getNick();
 
         if (kakaoId == null) {
             System.out.println("Kakao ID가 null입니다.");
             return ResponseEntity.badRequest().body(Map.of("error", "Kakao ID가 null입니다."));
         }
 
-        Long userId = userService.saveUser(kakaoId, nickname);
+        long userId = userService.saveUser(kakaoId, nick);
 
 
         Map<String, Object> response = new HashMap<>();
-        response.put("nickname", nickname);
+        response.put("nickname", nick);
         response.put("userId", userId);
         response.put("access_token", token);
 

@@ -108,9 +108,9 @@ public class KakaoService {
         // profileImg = jsonNode.get("properties").get("profile_image").asText();
         System.out.println("KAKAOID/NICKNAME: "+kakaoId+nickname);
 
-        Long userId = userService.saveUser(kakaoId, nickname);
+        int userId = userService.saveUser(kakaoId, nickname);
         System.out.println(userId);
-        if (userId == null) {
+        if (userId == 0) {
             System.out.println(userId+"!");
             throw new IllegalArgumentException("Kakao ID가 null입니다.");
         }

@@ -24,7 +24,7 @@ public class UserController {
 
     @PostMapping("/userUpdate")
     public ResponseEntity<UserResponseDto> updateUserInfo(
-            @RequestParam Long userId,
+            @RequestParam int userId,
             @RequestParam Integer age,
             @RequestParam Integer height,
             @RequestParam Integer weight,
@@ -36,7 +36,7 @@ public class UserController {
 
         UserResponseDto responseDto = new UserResponseDto(
                 user.getId(),
-                user.getNickname(),
+                user.getNick(),
                 user.getBmr()
         );
 

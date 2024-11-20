@@ -1,7 +1,7 @@
 package NutriPlan.model.Dto;
 
 public class UserDietDto {
-    private Long userId;
+    private int userId;
     private String foodName;
     private int servingSize;
     private double kcal;
@@ -10,11 +10,11 @@ public class UserDietDto {
     private double carbohydrate;
     private int mealTime;
 
-    public Long getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

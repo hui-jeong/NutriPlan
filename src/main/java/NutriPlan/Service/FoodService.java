@@ -143,10 +143,10 @@ public class FoodService {
         return foodList;
     }
     @Transactional
-    public void saveFoodForUser(Long userId, FoodNutrientDto foodDto,int mealTime) {
+    public void saveFoodForUser(int userId, FoodNutrientDto foodDto,int mealTime) {
 
 
-        if (userId == null) {
+        if (userId == 0) {
             throw new RuntimeException("User ID cannot be null");
         }
 
@@ -157,7 +157,7 @@ public class FoodService {
         }
 
         User user = userOptional.get();
-        System.out.println("User found: " + user.getNickname());
+        System.out.println("User found: " + user.getNick());
 
         Optional<FoodInfo> existingFood = foodInfoRepository.findByFoodName(foodDto.getFoodName());
 

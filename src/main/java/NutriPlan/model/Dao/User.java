@@ -3,50 +3,46 @@ package NutriPlan.model.Dao;
 
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import org.springframework.data.annotation.Id;
 
 @Setter
 @Getter
 @Entity
 public class User {
 
-    @jakarta.persistence.Id
+    //@jakarta.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "kakao_id",unique = true)
+    @Column(name = "kakao_id",unique = true, nullable = false)
     private Long kakaoId;
 
-    @Column(name = "nick", length = 20)
-    private String nickname;
+    @Column(name = "nick", length = 15,nullable = true)
+    private String nick;
 
-    @Column
+    @Column(nullable = true)
     private Integer height;
 
-    @Column
+    @Column(nullable = true)
     private Integer weight;
 
-    @Column
+    @Column(nullable = true)
     private Integer age;
 
-    @Column
+    @Column(nullable = true)
     private Integer bmr;
 
-    @Column
+    @Column(nullable = true)
     private Integer gender;
 
     public User() {}
 
-    public User(Long kakaoId,String nickname,Integer height, Integer weight, Integer age, Integer bmr,Integer gender){
+    public User(Long kakaoId,String nick,Integer height, Integer weight, Integer age, Integer bmr,Integer gender){
         this.kakaoId = kakaoId;
-        this.nickname = nickname;
+        this.nick = nick;
         this.height = height;
         this.weight = weight;
         this.age = age;
@@ -54,10 +50,10 @@ public class User {
         this.gender = gender;
     }
 
-    public Long getId(){
+    public int getId(){
         return id;
     }
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
     public Long getKakaoId() {
@@ -66,11 +62,11 @@ public class User {
     public void setKakaoId(Long kakaoId) {
         this.kakaoId = kakaoId;
     }
-    public String getNickname(){
-        return nickname;
+    public String getNick(){
+        return nick;
     }
-    public void setNickname(String nick) {
-        this.nickname = nick;
+    public void setNick(String nick) {
+        this.nick = nick;
     }
     public Integer getHeight(){
         return height;

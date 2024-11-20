@@ -14,14 +14,14 @@ public class UserDietPlan {
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)  // 지연 로딩 추가
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id",nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)  // 지연 로딩 추가
-    @JoinColumn(name = "food_id", referencedColumnName = "id")
+    @JoinColumn(name = "food_id", referencedColumnName = "id",nullable = false)
     private FoodInfo foodInfo;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate date;
 
     @Column(nullable = false)
