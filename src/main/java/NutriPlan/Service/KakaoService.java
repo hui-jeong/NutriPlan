@@ -18,17 +18,17 @@ import java.net.URI;
 @Service
 public class KakaoService {
 
-    @Autowired
+
     private final UserService userService;
 
     @Value("${kakao.client.id}")
     private String clientId;
 
-    @Value("${kakao.redirect.uri}")
-    private String redirectUrl;
+    @Value("${kakao.loginRedirect.uri}")
+    private String loginRedirectUri;
 
-    @Value("${kakao.redirect.uri}")
-    private String redirectUri;
+    @Value("${kakao.logoutRedirect.uri}")
+    private String logoutRedirectUri;
     public KakaoService( UserService userService) {
         this.userService = userService;
     }
@@ -54,7 +54,7 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", clientId);
-        body.add("redirect_uri", redirectUrl);
+        body.add("redirect_uri", loginRedirectUri);
         body.add("code", code);
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
@@ -123,33 +123,49 @@ public class KakaoService {
     }
 
     public String getKakaoAuthUrl() {
-        String authUrl = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + clientId + "&redirect_uri=" + redirectUri;
+        String authUrl = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + clientId + "&redirect_uri=" + loginRedirectUri;
         return authUrl;
     }
 
 
     //로그아웃
+    // 카카오 로그아웃 처리
     public void kakaoLogout(String accessToken) {
-        URI uri = UriComponentsBuilder
-                .fromUriString("https://kapi.kakao.com")
-                .path("/v1/user/logout")
-                .encode()
-                .build()
-                .toUri();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
-        RequestEntity<Void> requestEntity = RequestEntity
-                .post(uri)
-                .headers(headers)
-                .build();
-
+        String logoutUrl = "https://kapi.kakao.com/v1/user/logout";
         RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
 
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        restTemplate.exchange(requestEntity, Void.class);
+        try {
+            // 카카오 로그아웃 요청
+            ResponseEntity<String> logoutResponse = restTemplate.exchange(logoutUrl, HttpMethod.POST, entity, String.class);
+            System.out.println("카카오 로그아웃 응답: " + logoutResponse.getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("카카오 로그아웃 처리 중 오류가 발생했습니다.");
+        }
     }
+
+//    // 카카오 ID 추출 (accessToken을 이용)
+//    public Long getKakaoIdFromAccessToken(String accessToken) {
+//        String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set("Authorization", "Bearer " + accessToken);
+//
+//        HttpEntity<String> entity = new HttpEntity<>(headers);
+//        ResponseEntity<String> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.POST, entity, String.class);
+//
+//        JsonNode jsonNode;
+//        try {
+//            jsonNode = new ObjectMapper().readTree(userInfoResponse.getBody());
+//            return jsonNode.get("id").asLong();  // 카카오 ID 반환
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;  // 오류가 발생하면 null 반환
+//        }
+//    }
 
 }
