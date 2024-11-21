@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
+@Table(name = "user")
 public class User {
 
     //@jakarta.persistence.Id
