@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -66,40 +67,80 @@ public class KakaoLogin {
 
     }
 
-    //로그아웃
+    // 카카오 로그아웃
     @GetMapping("/spring/kakao/logout")
-    public String kakaoLogout(
-            @RequestParam("userId") int userId,  // 삭제할 사용자 ID
-            @RequestParam("access_token") String accessToken,  // 카카오 access_token
-            HttpServletRequest request,  // HttpServletRequest to invalidate session
-            HttpServletResponse response  // HttpServletResponse to handle cookies
-    ) {
-        try {
-            // 카카오 로그아웃 API 호출
-            kakaoService.kakaoLogout(accessToken); // KakaoService에서 로그아웃 처리
+    public String kakaoLogout(HttpServletRequest request, HttpServletResponse response) {
+        // 카카오 로그아웃 URL 가져오기 (서비스 메소드 호출)
+        String logoutUrl = kakaoService.getKakaoLogoutUrl();
 
-            // 사용자 삭제 (userId로 사용자 삭제)
-            userService.deleteUserByUserId(userId);
-
-            // 세션 무효화
-            request.getSession().invalidate();
-
-            // 'access_token' 쿠키 삭제
-            Cookie cookie = new Cookie("access_token", null);
-            cookie.setMaxAge(0);  // 쿠키를 즉시 만료
-            cookie.setPath("/");  // 모든 경로에서 쿠키 삭제
-            response.addCookie(cookie);
-
-            // 로그아웃 후 /logout으로 리다이렉트
-            return "redirect:/logout";  // 리다이렉트 URL
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "로그아웃 중 오류가 발생했습니다.";  // 오류 메시지 반환
-        }
+        // 세션 삭제
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();  // 세션 무효화
         }
 
-    @GetMapping("/logout")  // 로그아웃 후 리다이렉트될 URL
-    public String redirectToLogoutPage() {
-        return "로그아웃이 완료되었습니다. 다시 로그인 해주세요.";
+        // 쿠키 삭제 (필요 시)
+         Cookie cookie = new Cookie("access_token", null);
+         cookie.setMaxAge(0);
+         cookie.setPath("/");
+         response.addCookie(cookie);
+
+        // 카카오 로그아웃 URL로 리다이렉트
+        return "redirect:" + logoutUrl;
     }
+
+    // 로그아웃 결과 페이지 (로그아웃 후 리다이렉트 URL)
+    @GetMapping("/spring/kakao/logout/result")
+    public String logoutResult() {
+        return "/logoutResult";  // Thymeleaf 뷰 렌더링
+    }
+
+    @GetMapping("/Out")
+    public String redirectToLogoutSuccess() {
+        return "redirect:" +"http://192.168.10.103:8080/spring/kakao/logout/result";
+    }
+    @GetMapping("/page")
+    public String pageShow() {
+        System.out.println("aa");
+        return "/logoutResult";
+    }
+
+    //로그아웃
+//    @GetMapping("/spring/kakao/logout")
+//    public String kakaoLogout(
+//            @RequestParam("userId") int userId,  // 삭제할 사용자 ID
+//            @RequestParam("access_token") String accessToken,  // 카카오 access_token
+//            HttpServletRequest request,  // HttpServletRequest to invalidate session
+//            HttpServletResponse response  // HttpServletResponse to handle cookies
+//    ) {
+//        try {
+//            // 카카오 로그아웃 API 호출
+//            kakaoService.kakaoLogout(accessToken); // KakaoService에서 로그아웃 처리
+//
+//            // 사용자 삭제 (userId로 사용자 삭제)
+//            userService.deleteUserByUserId(userId);
+//
+//            // 세션 무효화
+//            request.getSession().invalidate();
+//
+//            // 'access_token' 쿠키 삭제
+//            Cookie cookie = new Cookie("access_token", null);
+//            cookie.setMaxAge(0);  // 쿠키를 즉시 만료
+//            cookie.setPath("/");  // 모든 경로에서 쿠키 삭제
+//            response.addCookie(cookie);
+//
+//            // 로그아웃 후 /logout으로 리다이렉트
+//            return "redirect:/logout";  // 리다이렉트 URL
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "로그아웃 중 오류가 발생했습니다.";  // 오류 메시지 반환
+//        }
+//    }
+//
+//    @GetMapping("/logout")  // 로그아웃 후 리다이렉트될 URL
+//    public String redirectToLogoutPage() {
+//        return "로그아웃이 완료되었습니다. 다시 로그인 해주세요.";
+//    }
+
+
 }

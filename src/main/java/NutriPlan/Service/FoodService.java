@@ -7,6 +7,7 @@ import NutriPlan.model.Dao.FoodInfo;
 import NutriPlan.model.Dao.User;
 import NutriPlan.model.Dao.UserDietPlan;
 import NutriPlan.model.Dto.FoodNutrientDto;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +68,18 @@ public class FoodService {
     public FoodService(FoodInfoRepository foodInfoRepository) {
         this.foodInfoRepository = foodInfoRepository;
     }
+
+//    @PostConstruct
+//    public void init() {
+//        try {
+//            System.out.println("Initializing food data fetch...");
+//            fetchAndSaveAllFoodData();
+//            System.out.println("Food data fetch complete.");
+//        } catch (Exception e) {
+//            System.err.println("Error during food data initialization: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
     @Cacheable(value = "foodSearchCache", key = "#foodName", unless = "#result == null || #result.isEmpty()")
     public List<FoodNutrientDto> searchFood(String foodName) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
@@ -214,4 +227,102 @@ public class FoodService {
             return 0;
         }
     }
+
+
+//    @Transactional
+//    public void fetchAndSaveAllFoodData() {
+//        RestTemplate restTemplate = new RestTemplate();
+//        int pageNo = 1;
+//        int numOfRows = 50;
+//        boolean hasMoreData = true;
+//        String api = "9hpTRisxBmOuhCEtV50bcIa4oegL9TzKCxdxEsNjyuJd6h2AWaRRJKLknN2mjObWPGjW7VB1LSkMX/7HGSDEBg==";
+//
+//        while (hasMoreData) {
+//            try {
+//                String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
+//                        .queryParam("serviceKey", api)
+//                        .queryParam("pageNo", pageNo)
+//                        .queryParam("numOfRows", numOfRows)
+//                        .queryParam("type", "xml")
+//                        .build(false)
+//                        .toUriString();
+//
+//                System.out.println("API 호출 URL: " + url);
+//
+//                HttpHeaders headers = new HttpHeaders();
+//                headers.add("Accept", "application/xml");
+//                HttpEntity<String> entity = new HttpEntity<>(headers);
+//
+//                ResponseEntity<byte[]> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
+//                String response = new String(responseEntity.getBody(), StandardCharsets.UTF_8);
+//
+//                System.out.println("API 응답 데이터: " + response);
+//
+//
+//                if (response.contains("<item>")) {
+//                    System.out.println("item 태그가 발견되었습니다.");
+//                } else {
+//                    System.err.println("item 태그가 없습니다.");
+//                }
+//
+//                if (response == null || response.isEmpty()) {
+//                    System.err.println("API 응답이 비어있습니다.");
+//                    break;
+//
+//                }
+//
+//                System.out.println("API 응답 수신 완료, 파싱 시작...");
+//
+//
+//                List<FoodNutrientDto> foodList = parseXmlResponseUsingSAX(response);
+//                System.out.println("파싱된 데이터 개수: " + foodList.size());
+//
+//
+//                saveFoodListToDatabase(foodList);
+//
+//
+//                if (foodList.size() < numOfRows) {
+//                    hasMoreData = false; // 마지막 페이지 도달
+//                } else {
+//                    pageNo++;
+//                }
+//
+//            } catch (Exception e) {
+//                System.err.println("API 호출 오류: " + e.getMessage());
+//                e.printStackTrace();
+//                hasMoreData = false; // 오류 발생 시 종료
+//            }
+//        }
+//        System.out.println("fetchAndSaveAllFoodData process completed.");
+//    }
+//    @Transactional
+//    protected void saveFoodListToDatabase(List<FoodNutrientDto> foodList) {
+//        System.out.println("데이터 저장 시작...");
+//        for (FoodNutrientDto foodDto : foodList) {
+//            try {
+//                Optional<FoodInfo> existingFood = foodInfoRepository.findByFoodName(foodDto.getFoodName());
+//                if (existingFood.isEmpty()) {
+//                    // 새로운 데이터 저장
+//                    FoodInfo newFood = new FoodInfo();
+//                    newFood.setFoodName(foodDto.getFoodName());
+//                    newFood.setServingSize(foodDto.getServingSize());
+//                    newFood.setKcal(foodDto.getKcal());
+//                    newFood.setCarbohydrate(foodDto.getCarbohydrate());
+//                    newFood.setProtein(foodDto.getProtein());
+//                    newFood.setFat(foodDto.getFat());
+//
+//                    foodInfoRepository.save(newFood);
+//                    System.out.println("저장된 음식: " + newFood.getFoodName());
+//                } else {
+//                    System.out.println("이미 존재하는 음식: " + foodDto.getFoodName());
+//                }
+//            } catch (Exception e) {
+//                System.err.println("음식 저장 중 오류: " + e.getMessage());
+//            }
+//        }
+//        System.out.println("데이터 저장 완료.");
+//    }
+
+
+
 }

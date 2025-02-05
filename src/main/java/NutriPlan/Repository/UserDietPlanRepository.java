@@ -11,4 +11,5 @@ import java.util.List;
 public interface UserDietPlanRepository extends JpaRepository<UserDietPlan, Integer> {
     //void saveUserDietPlan(Long userId, Long foodId);
     List<UserDietPlan> findByUserIdAndMealTimeAndDate(int userId, int mealTime, LocalDate date);
+    void deleteByUserId(int userId);
 }

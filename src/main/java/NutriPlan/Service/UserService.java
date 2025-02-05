@@ -1,6 +1,7 @@
 package NutriPlan.Service;
 
 
+import NutriPlan.Repository.UserDietPlanRepository;
 import NutriPlan.Repository.UserRepository;
 import NutriPlan.model.Dao.User;
 import jakarta.persistence.EntityManagerFactory;
@@ -17,6 +18,9 @@ public class UserService {
 
     @Autowired
     private EntityManagerFactory entityManagerFactory;
+
+    @Autowired
+    private UserDietPlanRepository userDietPlanRepository;
 
 
     public int saveUser(Long kakaoId, String nick){
@@ -85,6 +89,20 @@ public class UserService {
         optionalUser.ifPresent(user -> {
             Long kakaoId = user.getKakaoId();  // 해당 사용자의 kakaoId
             userRepository.delete(user);  // 해당 사용자 삭제
+            System.out.println("User with userId " + userId + " and kakaoId " + kakaoId + " has been deleted.");
+        });
+    }
+
+    public void deleteUserDietPlansByUserId(int userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);  // userId로 사용자 조회
+        optionalUser.ifPresent(user -> {
+            // 해당 사용자의 다이어트 계획 삭제
+            userDietPlanRepository.deleteByUserId(userId);
+            System.out.println("User's diet plans with userId " + userId + " have been deleted.");
+
+            // 해당 사용자 삭제
+            Long kakaoId = user.getKakaoId();  // 해당 사용자의 kakaoId
+            userRepository.delete(user);  // 사용자 삭제
             System.out.println("User with userId " + userId + " and kakaoId " + kakaoId + " has been deleted.");
         });
     }
